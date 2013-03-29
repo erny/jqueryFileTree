@@ -70,7 +70,7 @@ if (jQuery) (function($){
 								o.curPath += path;
 								var node = $(c).find('A[rel="'+ o.curPath +'"]');
 								if (node)
-									showTree(node.parent(), o.curPath);
+									node.trigger('click');
 							}
 						}
 					});

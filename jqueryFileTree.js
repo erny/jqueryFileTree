@@ -1,10 +1,8 @@
 // jQuery File Tree Plugin
 //
-// Version 1.01
+// Version 1.02, 30 March 2013
 //
-// Cory S.N. LaViska
-// A Beautiful Site (http://abeautifulsite.net/)
-// 24 March 2008
+// Cory S.N. LaVisk, A Beautiful Site (http://abeautifulsite.net/) and others
 //
 // Visit http://abeautifulsite.net/notebook.php?article=58 for more information
 //
@@ -13,15 +11,17 @@
 // Options:  root           - root folder to display; default = /
 //           script         - location of the serverside AJAX file to use; default = jqueryFileTree.php
 //           folderEvent    - event to trigger expand/collapse; default = click
-//           expandSpeed    - default = 500 (ms); use -1 for no animation
-//           collapseSpeed  - default = 500 (ms); use -1 for no animation
+//           expandSpeed    - default = 200 (ms); use -1 for no animation
+//           collapseSpeed  - default = 200 (ms); use -1 for no animation
 //           expandEasing   - easing function to use on expand (optional)
 //           collapseEasing - easing function to use on collapse (optional)
 //           multiFolder    - whether or not to limit the browser to one subfolder at a time
 //           loadMessage    - Message to display while initial tree loads (can be HTML)
+//           initialFolder  - Folder to be expanded initially
 //
 // History:
 //
+// 1.02 - support for initially expanded folder (initialFolder)  (30 March 2013), erevilla@tangrambpm.es
 // 1.01 - updated to work with foreign characters in directory/file names (12 April 2008)
 // 1.00 - released (24 March 2008)
 //
@@ -39,16 +39,16 @@ if (jQuery) (function($){
 			if( o.root == undefined ) o.root = '/';
 			if( o.script == undefined ) o.script = 'jqueryFileTree.php';
 			if( o.folderEvent == undefined ) o.folderEvent = 'click';
-			if( o.expandSpeed == undefined ) o.expandSpeed= 500;
-			if( o.collapseSpeed == undefined ) o.collapseSpeed= 500;
+			if( o.expandSpeed == undefined ) o.expandSpeed= 200;
+			if( o.collapseSpeed == undefined ) o.collapseSpeed= 200;
 			if( o.expandEasing == undefined ) o.expandEasing = null;
 			if( o.collapseEasing == undefined ) o.collapseEasing = null;
 			if( o.multiFolder == undefined ) o.multiFolder = true;
 			if( o.loadMessage == undefined ) o.loadMessage = 'Loading...';
 			if( o.initialFolder == undefined) o.initialFolder = '';
-
+			var curPath = '';
+			var paths = o.initialFolder.split('/');
 			$(this).each( function() {
-
 				function showTree(c, t) {
 					$(c).addClass('wait');
 					$(".jqueryFileTree.start").remove();
@@ -58,19 +58,13 @@ if (jQuery) (function($){
 						if( o.root == t ) $(c).find('UL:hidden').show(); else $(c).find('UL:hidden').slideDown({ duration: o.expandSpeed, easing: o.expandEasing });
 						bindTree(c);
 						// open initial folder
-						if (o.initialFolder != '') {
-							if (o.curPath == undefined)
-								o.curPath = '';
-							var paths = o.initialFolder.split('/');
+						if (paths != []) {
 							var path = paths[0];
 							paths.shift();
-							o.initialFolder = paths.join('/');
-							if (path != '') {
+							if (path) {
 								path += '/';
-								o.curPath += path;
-								var node = $(c).find('A[rel="'+ o.curPath +'"]');
-								if (node)
-									node.trigger('click');
+								curPath += path;
+								$(c).find('A[rel="'+ curPath +'"]').click();
 							}
 						}
 					});
